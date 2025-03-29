@@ -10,24 +10,29 @@ if sp:
     print("successul")
 
 def get_albums(year, month, day):
-    query = f'year:{year}'  
-    results = sp.search(q=query, type='album', limit=50)  # Increase limit to fetch more albums
-
+    query = f'year:{year}'
+    filtered_albums = []
+    markets = ['US','IN','GB', 'DE', 'FR', 'AU', 'CA']
+    for m in markets:
+        try:  
+            results = sp.search(q=query, type='album', limit=10, market=m) # Increase limit to fetch more albums
+            for album in results["albums"]["items"]:
+                if album["release_date"] == f"{year}-{month}-{day}":
+                    filtered_albums.append(f'{album['name']}----{album['artists'][0]['name']}')
+        except Exception as e:
+            print(e)
     # Filter albums by exact date
-    filtered_albums = [
-        album for album in results["albums"]["items"] 
-        if album["release_date"] == f"{year}-{month}-{day}"
-    ]
+    print(filtered_albums)
 
     # Sort by popularity (most popular first)
-    sorted_albums = sorted(filtered_albums, key=lambda x: x.get('popularity', 0), reverse=True)
+    # sorted_albums = sorted(filtered_albums, key=lambda x: x.get('popularity', 0), reverse=True)
 
-    if sorted_albums:
-        print(f"\n🎵 Albums Released on {day}-{month}-{year}: 🎵\n")
-        for i, album in enumerate(sorted_albums, start=1):
-            print(f"{i}. 📀 {album['name']} - {album['artists'][0]['name']} ({album['release_date']}) - Popularity: {album.get('popularity', 'N/A')}")
-    else:
-        print(f"\n😔 No albums found for {day}-{month}-{year}. 'You were dead for music' 🎶")
+    # if sorted_albums:
+    #     print(f"\n🎵 Albums Released on {day}-{month}-{year}: 🎵\n")
+    #     for i, album in enumerate(sorted_albums, start=1):
+    #         print(f"{i}. 📀 {album['name']} - {album['artists'][0]['name']} ({album['release_date']}) - Popularity: {album.get('popularity', 'N/A')}")
+    # else:
+    #     print(f"\n😔 No albums found for {day}-{month}-{year}. 'You were dead for music' 🎶")
 
 # Get user input
 bd = input('enter birthdate: ')
